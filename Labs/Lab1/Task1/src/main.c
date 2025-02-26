@@ -4,12 +4,33 @@
 #include <string.h>
 #include <stdarg.h>
 
-#include "include/enums.h"
-#include "include/user.h"
-#include "include/iohelper.h"
-#include "include/handlers.h"
+#include "enums.h"
+#include "user.h"
+#include "iohelper.h"
+#include "handlers.h"
 
-int main(int argc, char const *argv[])
+
+int main(){
+    char* str;
+    dynamicReadline(&str);
+
+    char** strings;
+    int cnt;
+
+    stringToWords(str, &strings, &cnt);
+
+    for (size_t i = 0; i < cnt; i++)
+    {
+        printf("%s ", strings[i]);
+        free(strings[i]);
+    }
+    free(strings);
+    free(str);
+    return 0;
+}
+
+
+/* int main(int argc, char const *argv[])
 {
     printf("Welcome to the time checker! You must login to start working with this software, input your login and password.\nIf you haven't logined yet, use the command <register>.\n");
     struct User user;
@@ -22,12 +43,12 @@ int main(int argc, char const *argv[])
         char *buffer, **strings;
         int ret, wordAmount;
 
-        ret = dynamicReadline(buffer);
+        ret = dynamicReadline(&buffer);
         if(ret != SUCCESS){
             errorHandler(ret);
             
         }
-        ret = stringToWords(buffer, strings, &wordAmount);
+        ret = stringToWords(buffer, &strings, &wordAmount);
         if(ret != SUCCESS){
             free(buffer);
             errorHandler(ret);
@@ -48,4 +69,4 @@ int main(int argc, char const *argv[])
     }
     
     return 0;
-}
+} */

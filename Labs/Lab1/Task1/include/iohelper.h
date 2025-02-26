@@ -6,8 +6,8 @@
 #include <string.h>
 #include "enums.h"
 
-int dynamicReadline(char* str);
-int stringToWords(char* string, char** strings, int* amount);
-int fDynamicReadline(char* str, FILE* file);
+int dynamicReadline(char** strr);
+int stringToWords(char* string, char*** strings, int* amount);
+int fDynamicReadline(char** strr, FILE* file);
 
 #endif 

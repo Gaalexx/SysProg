@@ -4,8 +4,7 @@
 #include <stdio.h>
 #include "enums.h"
 #include "commands.h"
-
-
+#include "user.h"
 
 int commandHandler(char** strings, struct User* user, int wordAmount);
 void errorHandler(int ret);

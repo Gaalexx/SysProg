@@ -1,5 +1,5 @@
-#include "include/enums.h"
-#include "include/commands.h"
+#include "enums.h"
+#include "commands.h"
 
 typedef int (*callback)(int, char**);
 
@@ -7,7 +7,7 @@ int reg(int argumentNumber, char** strings){
     return SUCCESS;
 }
 
-int log(int argumentNumber, char** strings){
+int logn(int argumentNumber, char** strings){
     return SUCCESS;
 }
 

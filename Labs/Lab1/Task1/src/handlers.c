@@ -1,15 +1,16 @@
 #include <stdio.h>
+#include <string.h>
 
-#include "include/enums.h"
-#include "include/commands.h"
-#include "include/handlers.h"
+#include "enums.h"
+#include "commands.h"
+#include "handlers.h"
 
 int commandHandler(char** strings, struct User* user, int wordAmount){
     if(wordAmount < 0 || strings == NULL || user == NULL){
         return NULL_ERROR;
     }
     char *commands[] = {"register", "login", "time", "date", "howmuch", "logout", "sanctions"};
-    callback funcs[] = {reg, log, time, date, howmuch, logout, sanctions};
+    callback funcs[] = {reg, logn, time, date, howmuch, logout, sanctions};
     int ret = NO_SUCH_FUNC;
     for (size_t i = 0; i < 7; i++)
     {

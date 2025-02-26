@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "include/enums.h"
-#include "include/user.h"
-#include "include/iohelper.h"
+#include "enums.h"
+#include "user.h"
+#include "iohelper.h"
 
 int registerToDb(const char* dbName, const char* userLogin, const char* userPassword, const int sanctions){
     if(!dbName || !userLogin || !userPassword){

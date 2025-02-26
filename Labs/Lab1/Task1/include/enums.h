@@ -1,4 +1,5 @@
-
+#ifndef ENUMS_H
+#define ENUMS_H
 enum retType{
     SUCCESS = 0,
     MEMORY_ERROR,
@@ -19,3 +20,5 @@ enum userState{
     UNLOGINED,
     SANCTIONED
 };
+
+#endif
