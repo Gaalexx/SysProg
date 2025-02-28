@@ -2,15 +2,16 @@
 #define COMMANDS_H
 
 #include "enums.h"
+#include "user.h"
 
-typedef int (*callback)(int, char**);
+typedef int (*callback)(int argumentNumber, char** strings, struct User* user);
 
-int reg(int argumentNumber, char** strings);
-int logn(int argumentNumber, char** strings);
-int time(int argumentNumber, char** strings);
-int date(int argumentNumber, char** strings);
-int howmuch(int argumentNumber, char** strings);
-int logout(int argumentNumber, char** strings);
-int sanctions(int argumentNumber, char** strings);
+int reg(int argumentNumber, char** strings, struct User* user);
+int logn(int argumentNumber, char** strings, struct User* user);
+int timeGet(int argumentNumber, char** strings, struct User* user);
+int date(int argumentNumber, char** strings, struct User* user);
+int howmuch(int argumentNumber, char** strings, struct User* user);
+int logout(int argumentNumber, char** strings, struct User* user);
+int sanctions(int argumentNumber, char** strings, struct User* user);
 
 #endif 

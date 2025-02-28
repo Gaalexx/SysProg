@@ -17,7 +17,7 @@ int fDynamicReadline(char** strr, FILE* file){
         return MEMORY_ERROR;
     }
     char letter;
-    while((letter = getc(stdin)) != '\n' && letter != EOF){
+    while((letter = fgetc(file)) != '\n' && letter != EOF){
         if(len == size){
             size *= 2;
             char* buf = (char*)malloc(sizeof(char) * size);
@@ -49,7 +49,7 @@ int dynamicReadline(char** strr){
     }
     char letter;
     while((letter = getc(stdin)) != '\n'){
-        if(len == size){
+        if(len + 1 == size){
             size *= 2;
             char* buf = (char*)malloc(sizeof(char) * size);
             if(!buf){
@@ -61,6 +61,7 @@ int dynamicReadline(char** strr){
             str = buf;
         }
         str[len++] = letter;
+        str[len] = '\0';
     }
     (*strr) = str;
     return SUCCESS;
@@ -79,7 +80,12 @@ int stringToWords(char* string, char*** strings, int* amount){ //не выдел
         (*amount) = -1;
         return MEMORY_ERROR;
     }
-    char* str = strtok(string, " ");
+    char* str = strtok(string, " \n\t");
+    if(str == NULL){
+        free(string);
+        (*amount) = -1;
+        return NULL_ERROR;
+    }
     do
     {
         int wordLen = strlen(str);
@@ -112,6 +118,6 @@ int stringToWords(char* string, char*** strings, int* amount){ //не выдел
             (*strings) = nw_stirngs;
         }
         (*strings)[(*amount)++] = save;
-    } while ((str = strtok(NULL, " ")) != NULL);
+    } while ((str = strtok(NULL, " \n\t")) != NULL);
     return SUCCESS;
 }

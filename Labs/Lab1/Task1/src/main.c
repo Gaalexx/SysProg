@@ -8,29 +8,10 @@
 #include "user.h"
 #include "iohelper.h"
 #include "handlers.h"
+#include "db.h"
 
 
-int main(){
-    char* str;
-    dynamicReadline(&str);
-
-    char** strings;
-    int cnt;
-
-    stringToWords(str, &strings, &cnt);
-
-    for (size_t i = 0; i < cnt; i++)
-    {
-        printf("%s ", strings[i]);
-        free(strings[i]);
-    }
-    free(strings);
-    free(str);
-    return 0;
-}
-
-
-/* int main(int argc, char const *argv[])
+int main(int argc, char const *argv[])
 {
     printf("Welcome to the time checker! You must login to start working with this software, input your login and password.\nIf you haven't logined yet, use the command <register>.\n");
     struct User user;
@@ -44,20 +25,35 @@ int main(){
         int ret, wordAmount;
 
         ret = dynamicReadline(&buffer);
+        if(strlen(buffer) == 0){
+            continue;
+        }
         if(ret != SUCCESS){
             errorHandler(ret);
-            
+            continue;
         }
         ret = stringToWords(buffer, &strings, &wordAmount);
         if(ret != SUCCESS){
             free(buffer);
             errorHandler(ret);
+            continue;
         }
 
+        ret = commandHandler(strings, &user, wordAmount);
+        if(ret != SUCCESS && ret != EXIT){
+            errorHandler(ret);
+            printf("Problem!\n");
+        }
+        else if(ret == EXIT){
+            for (size_t i = 0; i < wordAmount; i++)
+            {
+                free(strings[i]);
+            }
+            free(strings);
+            free(buffer);
+            return 0;
+        }
         
-
-        
-        //обработка команд
 
 
         for (size_t i = 0; i < wordAmount; i++)
@@ -69,4 +65,4 @@ int main(){
     }
     
     return 0;
-} */
+}

@@ -66,6 +66,10 @@
   "files.associations": {
     "enums.h": "c",
     "commands.h": "c",
-    "handlers.h": "c"
+    "handlers.h": "c",
+    "crypt.h": "c",
+    "string.h": "c",
+    "user.h": "c",
+    "iohelper.h": "c"
   }
 }

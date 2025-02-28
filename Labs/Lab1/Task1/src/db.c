@@ -1,8 +1,61 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <crypt.h>
+#include <string.h>
 #include "enums.h"
 #include "user.h"
 #include "iohelper.h"
+#include "db.h"
+
+
+int encryptPassword(const char *password, char **encrypted_password)
+{
+
+    char *salt = crypt_gensalt_ra(NULL, 0, NULL, 0);
+    if (!salt)
+    {
+        return CRYPT_ERROR;
+    }
+
+    void *enc_ctx = NULL;
+    int enc_cxt_sz = 0;
+    char *tmp_encrypted_password = crypt_ra(password, salt, &enc_ctx, &enc_cxt_sz);
+
+    if (tmp_encrypted_password == NULL)
+    {
+        free(salt);
+        return CRYPT_ERROR;
+    }
+
+    *encrypted_password = (char *)calloc((strlen(tmp_encrypted_password) + 1), sizeof(char));
+
+    strcpy(*encrypted_password, tmp_encrypted_password);
+
+    free(enc_ctx);
+    free(salt);
+    return SUCCESS;
+}
+
+int comparePasswords(const char *password, const char *hashed_password, int *compare_res)
+{
+
+    int cmp_res = 0;
+
+    void *enc_ctx = NULL;
+    int enc_cxt_sz = 0;
+
+    char *hashed_entered_password = crypt_ra(password, hashed_password, &enc_ctx, &enc_cxt_sz);
+    if (!hashed_entered_password)
+    {
+        return CRYPT_ERROR;
+    }
+
+    *compare_res = strcmp(hashed_password, hashed_entered_password);
+
+    free(enc_ctx);
+    return SUCCESS;
+}
+
 
 int registerToDb(const char* dbName, const char* userLogin, const char* userPassword, const int sanctions){
     if(!dbName || !userLogin || !userPassword){
@@ -20,11 +73,29 @@ int registerToDb(const char* dbName, const char* userLogin, const char* userPass
         return FILE_ERROR;
     }
 
-    fprintf(in, "%s %s %d\n", userLogin, userPassword/*захэшировать*/, sanctions); //доделать хэширование пароля
+    char* encryptedPassword;
+    int ret = encryptPassword(userPassword, &encryptedPassword);
+    if(ret != SUCCESS){
+        fclose(in);
+        return ret;
+    }
+    fprintf(in, "%s %s %d\n", userLogin, encryptedPassword, sanctions);
 
     fclose(in);
 
     return SUCCESS;
+}
+
+int changeSanctions(const char* dbName, const char* userLogin, const int newPermission){
+
+    FILE* f = fopen("db.txt", "r+");
+    if(!f){
+        return FILE_ERROR;
+    }
+
+    
+
+
 }
 
 
@@ -45,37 +116,71 @@ int loginDB(const char* dbName, const char* userLogin, const char* userPassword,
         iteration++;
         char* str;
         int stringsAmount;
-        retF = fDynamicReadline(str, out);
-        if(retF != SUCCESS || retF != END_OF_FILE){
+        retF = fDynamicReadline(&str, out);
+        if(retF != SUCCESS && retF != END_OF_FILE){
             fclose(out);
             return retF;
         }
 
         char** strings;
-        int ret = stringToWords(str, strings, &stringsAmount);
+        int ret = stringToWords(str, &strings, &stringsAmount);
         if(ret != SUCCESS){
             return ret; //память в случае чего очищается в функции
         }
 
-        if(!strcmp(strings[0], userLogin) && !strcmp(strings[1], userPassword/*захэшировать*/)){
+        if(!strcmp(strings[0], userLogin)){
+            int coinsidence;
+
+            comparePasswords(userPassword, strings[1], &coinsidence);
+            if(!coinsidence){
+                if(iteration == 1){ //если это первый зарегистрированный пользователь, то это админ
+                    user->state = ADMIN_LOGINED;
+                }else{
+                    user->state = LOGINED;
+                }
+    
+                user->attempts = atoi(strings[2]);
+
+                if(user->login != NULL){
+                    free(user->login);
+                }
+
+                int lgn_len = strlen(strings[0]);
+                char* lgn = malloc((lgn_len + 1) * sizeof(char));
+                if(!lgn){
+                    free(str);
+                    for (size_t i = 0; i < stringsAmount; i++)
+                    {
+                        free(strings[i]);
+                    }
+                    free(strings);
+                    fclose(out);
+                    return MEMORY_ERROR;
+                }
+                user->login = lgn;
+                lgn[lgn_len] = '\n';
+                strcpy(user->login, strings[0]);
+    
+                free(str);
+                for (size_t i = 0; i < stringsAmount; i++)
+                {
+                    free(strings[i]);
+                }
+                free(strings);
+                fclose(out);
+                return SUCCESS;
+            }
+            else{
+                free(str);
+                for (size_t i = 0; i < stringsAmount; i++)
+                {
+                    free(strings[i]);
+                }
+                free(strings);
+                fclose(out);
+                return WRONG_PASSWORD;
+            }
             
-            if(iteration == 1){ //если это первый зарегистрированный пользователь, то это админ
-                user->state = ADMIN_LOGINED;
-            }else{
-                user->state = LOGINED;
-            }
-
-            user->attempts = atoi(strings[2]);
-            strcpy(user->login, strings[0]);
-
-            free(str);
-            for (size_t i = 0; i < stringsAmount; i++)
-            {
-                free(strings[i]);
-            }
-            free(strings);
-            fclose(out);
-            return SUCCESS;
         }
         //основная работа
 
@@ -93,7 +198,7 @@ int loginDB(const char* dbName, const char* userLogin, const char* userPassword,
 }
 
 
-int findInDb(char* dbName, char* userLogin){
+int findInDb(const char* dbName, const char* userLogin){
     if(!dbName || !userLogin){
         return NULL_ERROR;
     }
@@ -106,14 +211,14 @@ int findInDb(char* dbName, char* userLogin){
     do{
         char* str;
         int stringsAmount;
-        retF = fDynamicReadline(str, out);
+        retF = fDynamicReadline(&str, out);
         if(retF != SUCCESS || retF != END_OF_FILE){
             fclose(out);
             return retF;
         }
 
         char** strings;
-        int ret = stringToWords(str, strings, &stringsAmount);
+        int ret = stringToWords(str, &strings, &stringsAmount);
         if(ret != SUCCESS){
             return ret; //память в случае чего очищается в функции
         }
