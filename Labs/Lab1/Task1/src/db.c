@@ -93,7 +93,57 @@ int changeSanctions(const char* dbName, const char* userLogin, const int newPerm
         return FILE_ERROR;
     }
 
-    
+    char* line;
+    int ret = fDynamicReadline(&line, f);
+    if(ret != SUCCESS){
+        fclose(f);
+        return ret;
+    }
+    int retSTW;
+
+
+    long long fileIndex = 0;
+    do
+    {
+        int numberOfWords;
+        char** words;
+        retSTW = stringToWords(line, &words, &numberOfWords);
+        if(retSTW == MEMORY_ERROR){
+            fclose(f);
+            free(line);
+        }
+
+        if(!strcmp(words[0], userLogin)){
+            fseek(f, fileIndex, SEEK_SET);
+            for (size_t i = 0; i < strlen(line) + 1; i++)
+            {
+                fputc("", f);
+            }
+
+            
+            //тут закрыть поток чтения и открыть поток append
+
+
+            for (size_t i = 0; i < numberOfWords; i++)
+            {
+                free(words[i]);
+            }
+            free(words);
+            free(line);
+            fclose(f);
+            return SUCCESS;
+        }
+
+
+        for (size_t i = 0; i < numberOfWords; i++)
+        {
+            free(words[i]);
+        }
+        free(words);
+        fileIndex += (strlen(line) + 1);
+        free(line);
+    } while ((ret = fDynamicReadline(&line, f)) != END_OF_FILE);
+    fclose(f);
 
 
 }
@@ -158,8 +208,9 @@ int loginDB(const char* dbName, const char* userLogin, const char* userPassword,
                     return MEMORY_ERROR;
                 }
                 user->login = lgn;
-                lgn[lgn_len] = '\n';
                 strcpy(user->login, strings[0]);
+                lgn[lgn_len] = '\0';
+                
     
                 free(str);
                 for (size_t i = 0; i < stringsAmount; i++)

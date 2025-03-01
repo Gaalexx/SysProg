@@ -16,6 +16,9 @@ int reg(int argumentNumber, char** strings, struct User* user){
 }
 
 int logn(int argumentNumber, char** strings, struct User* user){
+    if(user->state == LOGINED || user->state == ADMIN_LOGINED){
+        return ALREADY_LOGINED;
+    }
     if(argumentNumber != 3){
         return WRONG_AMOUNT_OF_ARGS;
     }
@@ -111,8 +114,12 @@ int howmuch(int argumentNumber, char** strings, struct User* user){
 }
 
 int logout(int argumentNumber, char** strings, struct User* user){
+    if(user->state == UNLOGINED){
+        return NOT_LOGINED;
+    }
     user->attempts = -1;
     free(user->login);
+    user->login = NULL;
     user->state = UNLOGINED;
     return SUCCESS;
 }

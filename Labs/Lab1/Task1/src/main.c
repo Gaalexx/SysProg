@@ -66,3 +66,18 @@ int main(int argc, char const *argv[])
     
     return 0;
 }
+
+
+/* Welcome to the time checker! You must login to start working with this software, input your login and password.
+If you haven't logined yet, use the command <register>.
+login Gaalex gaalex
+login alex alex
+Problem!
+logout
+logout
+Problem!
+login alex alex
+time
+Current time: 17:05:07
+logout
+free(): double free detected in tcache 2 */

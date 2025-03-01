@@ -69,6 +69,8 @@ int dynamicReadline(char** strr){
 
 
 int stringToWords(char* string, char*** strings, int* amount){ //не выделяю память под следующие строки
+    char **notNullStr;
+    (*strings) = notNullStr;
     if(!string || !(*strings) || !amount){
         return NULL_ERROR;
     }

@@ -15,6 +15,7 @@ int comparePasswords(const char *password, const char *hashed_password, int *com
 int registerToDb(const char* dbName, const char* userLogin, const char* userPassword, const int sanctions);
 int loginDB(const char* dbName, const char* userLogin, const char* userPassword, struct User* user);
 int findInDb(const char* dbName, const char* userLogin);
+int changeSanctions(const char* dbName, const char* userLogin, const int newPermission);
 
 
 #endif 
