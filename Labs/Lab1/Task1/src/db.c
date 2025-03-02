@@ -95,6 +95,7 @@ int changeSanctions(const char* dbName, const char* userLogin, const int newPerm
 
     char* line;
     int ret = fDynamicReadline(&line, f);
+    
     if(ret != SUCCESS){
         fclose(f);
         return ret;
@@ -107,21 +108,40 @@ int changeSanctions(const char* dbName, const char* userLogin, const int newPerm
     {
         int numberOfWords;
         char** words;
+        int len_line_beg = strlen(line) + 1;
         retSTW = stringToWords(line, &words, &numberOfWords);
         if(retSTW == MEMORY_ERROR){
             fclose(f);
             free(line);
         }
+        else if(!strcmp(words[0], "NU")){
+            for (size_t i = 0; i < numberOfWords; i++)
+            {
+                free(words[i]);
+            }
+            free(words);
+            fileIndex += len_line_beg;
+            free(line);
+            continue;
+        }
 
         if(!strcmp(words[0], userLogin)){
             fseek(f, fileIndex, SEEK_SET);
-            for (size_t i = 0; i < strlen(line) + 1; i++)
-            {
-                fputc("", f);
+            fputs("NU ", f);
+            fclose(f);
+
+            f = fopen(dbName, "a");
+            if(!f){
+                for (size_t i = 0; i < numberOfWords; i++)
+                {
+                    free(words[i]);
+                }
+                free(words);
+                free(line);
+                return FILE_ERROR;
             }
 
-            
-            //тут закрыть поток чтения и открыть поток append
+            fprintf(f, "%s %s %d\n", words[0], words[1], newPermission);
 
 
             for (size_t i = 0; i < numberOfWords; i++)
@@ -140,12 +160,11 @@ int changeSanctions(const char* dbName, const char* userLogin, const int newPerm
             free(words[i]);
         }
         free(words);
-        fileIndex += (strlen(line) + 1);
+        fileIndex += len_line_beg;
         free(line);
     } while ((ret = fDynamicReadline(&line, f)) != END_OF_FILE);
     fclose(f);
-
-
+    return NOT_CONSIST;
 }
 
 
@@ -175,8 +194,18 @@ int loginDB(const char* dbName, const char* userLogin, const char* userPassword,
         char** strings;
         int ret = stringToWords(str, &strings, &stringsAmount);
         if(ret != SUCCESS){
-            return ret; //память в случае чего очищается в функции
+            return ret; 
         }
+        else if(!strcmp(strings[0], "NU")){
+            free(str);
+            for (size_t i = 0; i < stringsAmount; i++)
+            {
+                free(strings[i]);
+            }
+            free(strings);
+            continue;
+        }
+        
 
         if(!strcmp(strings[0], userLogin)){
             int coinsidence;
@@ -263,7 +292,7 @@ int findInDb(const char* dbName, const char* userLogin){
         char* str;
         int stringsAmount;
         retF = fDynamicReadline(&str, out);
-        if(retF != SUCCESS || retF != END_OF_FILE){
+        if(retF != SUCCESS && retF != END_OF_FILE){
             fclose(out);
             return retF;
         }
@@ -272,6 +301,15 @@ int findInDb(const char* dbName, const char* userLogin){
         int ret = stringToWords(str, &strings, &stringsAmount);
         if(ret != SUCCESS){
             return ret; //память в случае чего очищается в функции
+        }
+        else if(!strcmp(strings[0], "NU")){
+            free(str);
+            for (size_t i = 0; i < stringsAmount; i++)
+            {
+                free(strings[i]);
+            }
+            free(strings);
+            continue;
         }
 
         if(!strcmp(strings[0], userLogin)){

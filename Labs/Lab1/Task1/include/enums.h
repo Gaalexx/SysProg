@@ -21,7 +21,9 @@ enum retType{
     UNKNOWN_KEY,
     NO_MESSAGE_RETURN,
     NO_PERMISSION,
-    MUST_BE_INT
+    MUST_BE_INT,
+    NU_IS_FORBIDDEN,
+    NO_ATTEMPTS
 };
 
 enum userState{

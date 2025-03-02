@@ -12,18 +12,26 @@ int commandHandler(char** strings, struct User* user, int wordAmount){
     char *commands[] = {"register", "login", "time", "date", "howmuch", "logout", "sanctions"};
     callback funcs[] = {reg, logn, timeGet, date, howmuch, logout, sanctions};
     int ret = NO_SUCH_FUNC;
-    for (size_t i = 0; i < 7; i++)
-    {
-        if(!strcmp(strings[0], commands[i])){
-            if(user->state == UNLOGINED && i > 1){
-                return NOT_LOGINED;
+    if(user->attempts != 0){
+        for (size_t i = 0; i < 7; i++)
+        {
+            if(!strcmp(strings[0], commands[i])){
+                if(user->state == UNLOGINED && i > 1){
+                    return NOT_LOGINED;
+                }
+                ret = funcs[i](wordAmount, strings, &(*user));
+                break;
             }
-            ret = funcs[i](wordAmount, strings, &(*user));
-            break;
         }
+    }
+    else{
+        return NO_ATTEMPTS;
     }
     if(!strcmp(strings[0], "exit")){
         return EXIT;
+    }
+    if(ret != NO_SUCH_FUNC && ret != EXIT && user->attempts > 0){
+        user->attempts--;
     }
     return ret;
 }

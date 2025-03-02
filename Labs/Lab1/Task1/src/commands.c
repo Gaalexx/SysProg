@@ -11,6 +11,12 @@ int reg(int argumentNumber, char** strings, struct User* user){
     if(argumentNumber != 3){
         return WRONG_AMOUNT_OF_ARGS;
     }
+    else if(argumentNumber != 3){
+        return WRONG_AMOUNT_OF_ARGS;
+    }
+    else if(!strcmp(strings[0], "NU")){
+        return NU_IS_FORBIDDEN;
+    }
     int ret = registerToDb("db.txt", strings[1], strings[2], -1);
     return ret;
 }
@@ -19,8 +25,11 @@ int logn(int argumentNumber, char** strings, struct User* user){
     if(user->state == LOGINED || user->state == ADMIN_LOGINED){
         return ALREADY_LOGINED;
     }
-    if(argumentNumber != 3){
+    else if(argumentNumber != 3){
         return WRONG_AMOUNT_OF_ARGS;
+    }
+    else if(!strcmp(strings[0], "NU")){
+        return NU_IS_FORBIDDEN;
     }
     int ret = loginDB("db.txt", strings[1], strings[2], &(*user));
     return ret;
@@ -131,7 +140,7 @@ int sanctions(int argumentNumber, char** strings, struct User* user){
     else if(user->state != ADMIN_LOGINED){
         return NO_PERMISSION;
     }
-    if(findInDb("db.c", strings[1]) != CONSIST){
+    if(findInDb("db.txt", strings[1]) != CONSIST){
         return NOT_CONSIST;
     }
 
@@ -142,6 +151,7 @@ int sanctions(int argumentNumber, char** strings, struct User* user){
         }
     }
     
+    int ret = changeSanctions("db.txt", strings[1], atoi(strings[2]));
 
-    return SUCCESS;
+    return ret;
 }
