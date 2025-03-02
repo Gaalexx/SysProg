@@ -13,5 +13,5 @@ int date(int argumentNumber, char** strings, struct User* user);
 int howmuch(int argumentNumber, char** strings, struct User* user);
 int logout(int argumentNumber, char** strings, struct User* user);
 int sanctions(int argumentNumber, char** strings, struct User* user);
-
+int help(int argumentNumber, char** strings, struct User* user);
 #endif 

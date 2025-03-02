@@ -9,8 +9,8 @@ int commandHandler(char** strings, struct User* user, int wordAmount){
     if(wordAmount < 0 || strings == NULL || user == NULL){
         return NULL_ERROR;
     }
-    char *commands[] = {"register", "login", "time", "date", "howmuch", "logout", "sanctions"};
-    callback funcs[] = {reg, logn, timeGet, date, howmuch, logout, sanctions};
+    char *commands[] = {"register", "login", "time", "date", "howmuch", "logout", "sanctions", "help"};
+    callback funcs[] = {reg, logn, timeGet, date, howmuch, logout, sanctions, help};
     int ret = NO_SUCH_FUNC;
     if(user->attempts != 0){
         for (size_t i = 0; i < 7; i++)

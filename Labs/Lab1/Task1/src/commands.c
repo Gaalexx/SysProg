@@ -2,9 +2,12 @@
 #include "commands.h"
 #include "db.h"
 #include "user.h"
+#include "dateFuncs.h"
 
 #include <time.h>
 #include <ctype.h>
+
+
 
 
 int reg(int argumentNumber, char** strings, struct User* user){
@@ -55,6 +58,8 @@ int date(int argumentNumber, char** strings, struct User* user){
     return SUCCESS;
 }
 
+
+
 int howmuch(int argumentNumber, char** strings, struct User* user){
     
 
@@ -65,13 +70,14 @@ int howmuch(int argumentNumber, char** strings, struct User* user){
         printf("Unknown key %s!\n", strings[2]);
         return NO_MESSAGE_RETURN;
     }
+  
 
     time_t now;
     time(&now);
     
-    time_t tmp = 0;
-    struct tm* parsed_timeinfo = localtime(&tmp);
+    struct tm* timeInfoNow = localtime(&now);
 
+    
     int day = -1, month = -1, year = -1;
     for (size_t i = 0; i < strlen(strings[1]); i++)
     {
@@ -81,38 +87,38 @@ int howmuch(int argumentNumber, char** strings, struct User* user){
     }
     
     sscanf(strings[1], "%d/%d/%d", &day, &month, &year);
-    year -= 1900;
     
     if(day > 31 || month > 12 || day < 0 || month < 0){
         return DATE_ERROR;
     }
+    else if(day > daysInMonth(month, year)){
+        return DATE_ERROR;
+    }
 
-
-    parsed_timeinfo->tm_mon = month;
-    parsed_timeinfo->tm_year = year;
-    parsed_timeinfo->tm_mday = day;
-
-
+    struct Date d1, d2;
     
+    d1.year = 1900 + timeInfoNow->tm_year;
+    d1.month = timeInfoNow->tm_mon;
+    d1.day = timeInfoNow->tm_mday;
 
-    time_t parsed_secs = mktime(&parsed_timeinfo);
-
-    time_t delta = abs(parsed_secs - delta);
+    d2.year = year;
+    d2.month = month;
+    d2.day = day;
 
 
     switch (strings[2][1])
     {
     case 's':
-        printf("The difference in seconds is %d\n", delta);
+        printf("Delta in seconds: %lld\n", daysDelta(d1, d2) * 24 * 60 * 60);
         break;
     case 'm':
-        printf("The difference in minutes is %d\n", delta / 60);
+        printf("Delta in minutes: %lld\n", daysDelta(d1, d2) * 24 * 60);
         break;
     case 'h':
-        printf("The difference in hours is %d\n", delta / 3600);
+        printf("Delta in hours: %lld\n", daysDelta(d1, d2) * 24);
         break;
     case 'y':
-        printf("The difference in years is %d\n", delta / 60 / 60 / 24 / 364);
+        printf("Delta in years: %d\n", yearsDelta(d1, d2));
         break;
     default:
         printf("Unknown key %s!\n", strings[2]);
@@ -154,4 +160,21 @@ int sanctions(int argumentNumber, char** strings, struct User* user){
     int ret = changeSanctions("db.txt", strings[1], atoi(strings[2]));
 
     return ret;
+}
+
+int help(int argumentNumber, char** strings, struct User* user){
+    if(user == NULL){
+        return NULL_ERROR;
+    }
+    else if(user->state != ADMIN_LOGINED){
+        printf("These are avaliable commands:\n1) register <login> <password>\n2) login <login> <password>\n"
+               "3) time\n4) date\n 5) howmuch <date> <flag> (-s - in seconds; -h - in hours; -m - in minutes; -y - in years)\n"
+               "6) logout\n");
+    }
+    else{
+        printf("These are avaliable commands:\n1) register <login> <password>\n2) login <login> <password>\n"
+               "3) time\n4) date\n 5) howmuch <date> <flag> (-s - in seconds; -h - in hours; -m - in minutes; -y - in years)\n"
+               "6) logout\nADMIN MENU:\n1*) sanctions <login> <attempts>\n");
+    }
+    return SUCCESS;
 }
