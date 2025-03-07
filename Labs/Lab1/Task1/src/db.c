@@ -40,6 +40,7 @@ int comparePasswords(const char *password, const char *hashed_password, int *com
 {
 
     int cmp_res = 0;
+    (void)cmp_res;
 
     void *enc_ctx = NULL;
     int enc_cxt_sz = 0;
@@ -115,7 +116,7 @@ int changeSanctions(const char* dbName, const char* userLogin, const int newPerm
             free(line);
         }
         else if(!strcmp(words[0], "NU")){
-            for (size_t i = 0; i < numberOfWords; i++)
+            for (size_t i = 0; i < (size_t)numberOfWords; i++)
             {
                 free(words[i]);
             }
@@ -132,7 +133,7 @@ int changeSanctions(const char* dbName, const char* userLogin, const int newPerm
 
             f = fopen(dbName, "a");
             if(!f){
-                for (size_t i = 0; i < numberOfWords; i++)
+                for (size_t i = 0; i < (size_t)numberOfWords; i++)
                 {
                     free(words[i]);
                 }
@@ -144,7 +145,7 @@ int changeSanctions(const char* dbName, const char* userLogin, const int newPerm
             fprintf(f, "%s %s %d\n", words[0], words[1], newPermission);
 
 
-            for (size_t i = 0; i < numberOfWords; i++)
+            for (size_t i = 0; i < (size_t)numberOfWords; i++)
             {
                 free(words[i]);
             }
@@ -155,7 +156,7 @@ int changeSanctions(const char* dbName, const char* userLogin, const int newPerm
         }
 
 
-        for (size_t i = 0; i < numberOfWords; i++)
+        for (size_t i = 0; i < (size_t)numberOfWords; i++)
         {
             free(words[i]);
         }
@@ -198,7 +199,7 @@ int loginDB(const char* dbName, const char* userLogin, const char* userPassword,
         }
         else if(!strcmp(strings[0], "NU")){
             free(str);
-            for (size_t i = 0; i < stringsAmount; i++)
+            for (size_t i = 0; i < (size_t)stringsAmount; i++)
             {
                 free(strings[i]);
             }
@@ -228,7 +229,7 @@ int loginDB(const char* dbName, const char* userLogin, const char* userPassword,
                 char* lgn = malloc((lgn_len + 1) * sizeof(char));
                 if(!lgn){
                     free(str);
-                    for (size_t i = 0; i < stringsAmount; i++)
+                    for (size_t i = 0; i < (size_t)stringsAmount; i++)
                     {
                         free(strings[i]);
                     }
@@ -242,7 +243,7 @@ int loginDB(const char* dbName, const char* userLogin, const char* userPassword,
                 
     
                 free(str);
-                for (size_t i = 0; i < stringsAmount; i++)
+                for (size_t i = 0; i < (size_t)stringsAmount; i++)
                 {
                     free(strings[i]);
                 }
@@ -252,7 +253,7 @@ int loginDB(const char* dbName, const char* userLogin, const char* userPassword,
             }
             else{
                 free(str);
-                for (size_t i = 0; i < stringsAmount; i++)
+                for (size_t i = 0; i < (size_t)stringsAmount; i++)
                 {
                     free(strings[i]);
                 }
@@ -266,7 +267,7 @@ int loginDB(const char* dbName, const char* userLogin, const char* userPassword,
 
 
         free(str);
-        for (size_t i = 0; i < stringsAmount; i++)
+        for (size_t i = 0; i < (size_t)stringsAmount; i++)
         {
             free(strings[i]);
         }
@@ -304,7 +305,7 @@ int findInDb(const char* dbName, const char* userLogin){
         }
         else if(!strcmp(strings[0], "NU")){
             free(str);
-            for (size_t i = 0; i < stringsAmount; i++)
+            for (size_t i = 0; i < (size_t)stringsAmount; i++)
             {
                 free(strings[i]);
             }
@@ -314,7 +315,7 @@ int findInDb(const char* dbName, const char* userLogin){
 
         if(!strcmp(strings[0], userLogin)){
             free(str);
-            for (size_t i = 0; i < stringsAmount; i++)
+            for (size_t i = 0; i < (size_t)stringsAmount; i++)
             {
                 free(strings[i]);
             }
@@ -326,7 +327,7 @@ int findInDb(const char* dbName, const char* userLogin){
 
 
         free(str);
-        for (size_t i = 0; i < stringsAmount; i++)
+        for (size_t i = 0; i < (size_t)stringsAmount; i++)
         {
             free(strings[i]);
         }

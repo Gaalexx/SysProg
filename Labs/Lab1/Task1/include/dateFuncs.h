@@ -17,4 +17,4 @@ int daysInMonth(int month, int year);
 int daysRemainsForEnd(int year, int month, int day);
 long long int daysDelta(struct Date curDate, struct Date otherDate);
 
-#endif // DATE_UTILS_H
+#endif

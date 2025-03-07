@@ -23,7 +23,8 @@ enum retType{
     NO_PERMISSION,
     MUST_BE_INT,
     NU_IS_FORBIDDEN,
-    NO_ATTEMPTS
+    NO_ATTEMPTS,
+    WRONG_LEN
 };
 
 enum userState{

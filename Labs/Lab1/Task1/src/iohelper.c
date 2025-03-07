@@ -12,26 +12,26 @@ int fDynamicReadline(char** strr, FILE* file){
 
 
     size_t size = 32, len = 0;
-    char *str = (char*)malloc(size * sizeof(char));
-    if(!str){
+    (*strr) = (char*)malloc(size * sizeof(char));
+    if(!(*strr)){
         return MEMORY_ERROR;
     }
     char letter;
     while((letter = fgetc(file)) != '\n' && letter != EOF){
-        if(len == size){
+        if(len + 1 == size){
             size *= 2;
             char* buf = (char*)malloc(sizeof(char) * size);
             if(!buf){
-                free(str);
+                free((*strr));
                 return MEMORY_ERROR;
             }
-            memcpy(buf, str, size/2);
-            free(str);
-            str = buf;
+            memcpy(buf, (*strr), size/2);
+            free(*strr);
+            (*strr) = buf;
         }
-        str[len++] = letter;
+        (*strr)[len++] = letter;
+        (*strr)[len] = '\0';
     }
-    (*strr) = str;
     if(letter == EOF){
         return END_OF_FILE;
     }
@@ -43,54 +43,49 @@ int dynamicReadline(char** strr){
         return NULL_ERROR;
     }
     size_t size = 32, len = 0;
-    char* str = (char*)malloc(size * sizeof(char));
-    if(!str){
+    (*strr) = (char*)malloc(size * sizeof(char));
+    if(!(*strr)){
         return MEMORY_ERROR;
     }
     char letter;
     while((letter = getc(stdin)) != '\n'){
         if(len + 1 == size){
             size *= 2;
-            char* buf = (char*)malloc(sizeof(char) * size);
+            char* buf = (char*)realloc((*strr), sizeof(char) * size);
             if(!buf){
-                free(str);
+                free((*strr));
                 return MEMORY_ERROR;
             }
-            memcpy(buf, str, size/2);
-            free(str);
-            str = buf;
+            free((*strr));
+            (*strr) = buf;
         }
-        str[len++] = letter;
-        str[len] = '\0';
+        (*strr)[len++] = letter;
+        (*strr)[len] = '\0';
     }
-    (*strr) = str;
     return SUCCESS;
 }
 
 
-int stringToWords(char* string, char*** strings, int* amount){ //не выделяю память под следующие строки
-    char **notNullStr;
-    (*strings) = notNullStr;
-    if(!string || !(*strings) || !amount){
+int stringToWords(char* str, char*** strings, int* amount){
+    
+    if(!str || !(*strings) || !amount){
         return NULL_ERROR;
     }
     (*amount) = 0;
     size_t size = 1;
     (*strings) = (char**)malloc(size * sizeof(char*));
     if(!(*strings)){
-        free(string);
         (*amount) = -1;
         return MEMORY_ERROR;
     }
-    char* str = strtok(string, " \n\t");
-    if(str == NULL){
-        free(string);
+    char* ptr = strtok(str, " \n\t");
+    if(ptr == NULL){
         (*amount) = -1;
         return NULL_ERROR;
     }
     do
     {
-        int wordLen = strlen(str);
+        int wordLen = strlen(ptr);
         char* save = (char*)malloc((wordLen + 1) * sizeof(char));
         if(!save){
             free(save);
@@ -98,12 +93,12 @@ int stringToWords(char* string, char*** strings, int* amount){ //не выдел
             {
                 free((*strings)[i]);
             }
-            free(string);
+            free(str);
             (*amount) = -1;
             return MEMORY_ERROR;
         }
 
-        memcpy(save, str, wordLen);
+        memcpy(save, ptr, wordLen);
         save[wordLen] = '\0';
 
         if((*amount) == (int)size){
@@ -120,6 +115,6 @@ int stringToWords(char* string, char*** strings, int* amount){ //не выдел
             (*strings) = nw_stirngs;
         }
         (*strings)[(*amount)++] = save;
-    } while ((str = strtok(NULL, " \n\t")) != NULL);
+    } while ((ptr = strtok(NULL, " \n\t")) != NULL);
     return SUCCESS;
 }

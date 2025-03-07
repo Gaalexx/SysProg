@@ -19,6 +19,9 @@ int main(int argc, char const *argv[])
     user.attempts = -1;
     user.login = NULL;
 
+    (void)argc;
+    (void)argv;
+
     for (;;)
     {
         char *buffer, **strings;
@@ -42,10 +45,9 @@ int main(int argc, char const *argv[])
         ret = commandHandler(strings, &user, wordAmount);
         if(ret != SUCCESS && ret != EXIT){
             errorHandler(ret);
-            printf("Problem!\n");
         }
         else if(ret == EXIT){
-            for (size_t i = 0; i < wordAmount; i++)
+            for (size_t i = 0; i < (size_t)wordAmount; i++)
             {
                 free(strings[i]);
             }
@@ -56,7 +58,7 @@ int main(int argc, char const *argv[])
         
 
 
-        for (size_t i = 0; i < wordAmount; i++)
+        for (size_t i = 0; i < (size_t)wordAmount; i++)
         {
             free(strings[i]);
         }

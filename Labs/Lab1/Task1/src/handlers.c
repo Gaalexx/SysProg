@@ -9,28 +9,38 @@ int commandHandler(char** strings, struct User* user, int wordAmount){
     if(wordAmount < 0 || strings == NULL || user == NULL){
         return NULL_ERROR;
     }
-    char *commands[] = {"register", "login", "time", "date", "howmuch", "logout", "sanctions", "help"};
-    callback funcs[] = {reg, logn, timeGet, date, howmuch, logout, sanctions, help};
-    int ret = NO_SUCH_FUNC;
-    if(user->attempts != 0){
-        for (size_t i = 0; i < 7; i++)
-        {
-            if(!strcmp(strings[0], commands[i])){
-                if(user->state == UNLOGINED && i > 1){
-                    return NOT_LOGINED;
-                }
-                ret = funcs[i](wordAmount, strings, &(*user));
-                break;
-            }
-        }
-    }
-    else{
-        return NO_ATTEMPTS;
-    }
     if(!strcmp(strings[0], "exit")){
         return EXIT;
     }
-    if(ret != NO_SUCH_FUNC && ret != EXIT && user->attempts > 0){
+    char *commands[] = {"help", "register", "login", "logout", "time", "date", "howmuch", "sanctions"};
+    callback funcs[] = {help, reg, logn, logout, timeGet, date, howmuch, sanctions};
+    int ret = NO_SUCH_FUNC;
+    for (size_t i = 0; i < 8; i++)
+    {
+        if(!strcmp(strings[0], commands[i])){
+            if(user->state == UNLOGINED && i > 2){
+                return NOT_LOGINED;
+            }/* else if(i <= 2){
+                ret = funcs[i](wordAmount, strings, &(*user));
+            } */
+            else if(user->state != UNLOGINED && i > 3){
+                if(user->attempts != 0){
+                    ret = funcs[i](wordAmount, strings, &(*user));
+                }
+                else{
+                    return NO_ATTEMPTS;
+                }
+            }
+            else if(user->state != UNLOGINED && i == 3){
+                ret = funcs[i](wordAmount, strings, &(*user));
+            }
+            else{
+                ret = funcs[i](wordAmount, strings, &(*user));
+            }
+            break;
+        }
+    }
+    if(ret != NO_SUCH_FUNC && ret != EXIT && user->attempts > 0 && strcmp(strings[0], "login")){
         user->attempts--;
     }
     return ret;
@@ -46,9 +56,52 @@ void errorHandler(int ret){
         printf("File error!\n");
         break;
     case NULL_ERROR:
-        printf("Nul error!\n");
+        printf("Null error!\n");
+        break;
+    case NO_SUCH_FUNC:
+        printf("There is no such command!\n");
+        break;
+    case ALREADY_LOGINED:
+        printf("You are already logined!\n");
+        break;
+    case NOT_LOGINED:
+        printf("You are not logined!\n");
+        break;
+    case ALREADY_EXIST:
+        printf("Such login already exists!\n");
+        break;
+    case LOGIN_FAILED:
+        printf("Login failed! Try another time!\n");
+        break;
+    case WRONG_PASSWORD:
+        printf("Wrong password!\n");
+        break;
+    case WRONG_AMOUNT_OF_ARGS:
+        printf("Wrong amount of passwords for this command. Use 'help' to check avaliable commands and needed arguments!\n");
+        break;
+    case DATE_ERROR:
+        printf("Date error. May be you have made a mistake in a date!\n");
+        break;
+    case UNKNOWN_KEY:
+        printf("Unknown key for this function!\n");
+        break;
+    case NO_PERMISSION:
+        printf("You have no permission to use this command!\n");
+        break;
+    case MUST_BE_INT:
+        printf("The argument must be integer!\n");
+        break;
+    case NU_IS_FORBIDDEN:
+        printf("Login 'NU' is forbidden!\n");
+        break;
+    case NO_ATTEMPTS:
+        printf("You have run out of your attemps, try it in another session!\n");
+        break;
+    case WRONG_LEN:
+        printf("The password mustn't be longer than 6 symbols!\n");
         break;
     default:
         break;
     }
+    return;
 }

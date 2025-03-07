@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": false,
-      "cwd": "/home/gaalex/Programs/SysProg/Labs/Lab1/Task1/src",
-      "program": "/home/gaalex/Programs/SysProg/Labs/Lab1/Task1/src/build/Debug/outDebug",
+      "cwd": "/home/gaalex/Programs/SysProg/SysProg/Labs/Lab1/Task1/src",
+      "program": "/home/gaalex/Programs/SysProg/SysProg/Labs/Lab1/Task1/src/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

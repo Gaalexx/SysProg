@@ -11,6 +11,7 @@
 
 
 int reg(int argumentNumber, char** strings, struct User* user){
+    (void)user;
     if(argumentNumber != 3){
         return WRONG_AMOUNT_OF_ARGS;
     }
@@ -20,6 +21,16 @@ int reg(int argumentNumber, char** strings, struct User* user){
     else if(!strcmp(strings[0], "NU")){
         return NU_IS_FORBIDDEN;
     }
+    else if(strlen(strings[2]) > 6){
+        return WRONG_LEN;
+    }
+    for (size_t i = 0; i < (size_t)strlen(strings[2]); i++)
+    {
+        if(!isdigit(strings[2][i])){
+            return MUST_BE_INT;
+        }
+    }
+    
     int ret = registerToDb("db.txt", strings[1], strings[2], -1);
     return ret;
 }
@@ -39,6 +50,9 @@ int logn(int argumentNumber, char** strings, struct User* user){
 }
 
 int timeGet(int argumentNumber, char** strings, struct User* user){
+    (void)argumentNumber;
+    (void)strings;
+    (void)user;
     time_t rawtime;
     struct tm* timeinfo;
 
@@ -49,6 +63,10 @@ int timeGet(int argumentNumber, char** strings, struct User* user){
 }
 
 int date(int argumentNumber, char** strings, struct User* user){
+    (void)argumentNumber;
+    (void)strings;
+    (void)user;
+
     time_t rawtime;
     struct tm* timeinfo;
 
@@ -61,7 +79,7 @@ int date(int argumentNumber, char** strings, struct User* user){
 
 
 int howmuch(int argumentNumber, char** strings, struct User* user){
-    
+    (void)user;
 
     if(argumentNumber != 3){
         return WRONG_AMOUNT_OF_ARGS;
@@ -129,6 +147,8 @@ int howmuch(int argumentNumber, char** strings, struct User* user){
 }
 
 int logout(int argumentNumber, char** strings, struct User* user){
+    (void)argumentNumber;
+    (void)strings;
     if(user->state == UNLOGINED){
         return NOT_LOGINED;
     }
@@ -163,17 +183,19 @@ int sanctions(int argumentNumber, char** strings, struct User* user){
 }
 
 int help(int argumentNumber, char** strings, struct User* user){
+    (void)argumentNumber;
+    (void)strings;
     if(user == NULL){
         return NULL_ERROR;
     }
     else if(user->state != ADMIN_LOGINED){
         printf("These are avaliable commands:\n1) register <login> <password>\n2) login <login> <password>\n"
-               "3) time\n4) date\n 5) howmuch <date> <flag> (-s - in seconds; -h - in hours; -m - in minutes; -y - in years)\n"
+               "3) time\n4) date\n5) howmuch <date> <flag> (-s - in seconds; -h - in hours; -m - in minutes; -y - in years)\n"
                "6) logout\n");
     }
     else{
         printf("These are avaliable commands:\n1) register <login> <password>\n2) login <login> <password>\n"
-               "3) time\n4) date\n 5) howmuch <date> <flag> (-s - in seconds; -h - in hours; -m - in minutes; -y - in years)\n"
+               "3) time\n4) date\n5) howmuch <date> <flag> (-s - in seconds; -h - in hours; -m - in minutes; -y - in years)\n"
                "6) logout\nADMIN MENU:\n1*) sanctions <login> <attempts>\n");
     }
     return SUCCESS;

@@ -1,5 +1,7 @@
 #include "enums.h"
 #include "dateFuncs.h"
+#include <stdlib.h>
+#include <math.h>
 
 
 
@@ -52,7 +54,7 @@ int yearsDelta(struct Date curDate, struct Date otherDate){
     if(dateCmp(curDate, otherDate) == 0){
         return 0;
     }
-    int delta = abs(curDate.year - otherDate.year) - 1;
+    int delta = abs((int)curDate.year - (int)otherDate.year) - 1;
     if(delta == -1){
         return 0;
     }
