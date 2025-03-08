@@ -68,7 +68,7 @@ int dynamicReadline(char** strr){
 
 int stringToWords(char* str, char*** strings, int* amount){
     
-    if(!str || !(*strings) || !amount){
+    if(!str || !strings || !amount){
         return NULL_ERROR;
     }
     (*amount) = 0;

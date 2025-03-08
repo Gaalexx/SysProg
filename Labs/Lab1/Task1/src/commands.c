@@ -11,7 +11,9 @@
 
 
 int reg(int argumentNumber, char** strings, struct User* user){
-    (void)user;
+    if(user->state == LOGINED || user->state == ADMIN_LOGINED){
+        return ALREADY_LOGINED;
+    }
     if(argumentNumber != 3){
         return WRONG_AMOUNT_OF_ARGS;
     }

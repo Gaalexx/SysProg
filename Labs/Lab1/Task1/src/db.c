@@ -30,7 +30,7 @@ int encryptPassword(const char *password, char **encrypted_password)
     *encrypted_password = (char *)calloc((strlen(tmp_encrypted_password) + 1), sizeof(char));
 
     strcpy(*encrypted_password, tmp_encrypted_password);
-
+    
     free(enc_ctx);
     free(salt);
     return SUCCESS;
@@ -52,7 +52,7 @@ int comparePasswords(const char *password, const char *hashed_password, int *com
     }
 
     *compare_res = strcmp(hashed_password, hashed_entered_password);
-
+    
     free(enc_ctx);
     return SUCCESS;
 }
@@ -81,7 +81,7 @@ int registerToDb(const char* dbName, const char* userLogin, const char* userPass
         return ret;
     }
     fprintf(in, "%s %s %d\n", userLogin, encryptedPassword, sanctions);
-
+    free(encryptedPassword);
     fclose(in);
 
     return SUCCESS;
@@ -164,6 +164,7 @@ int changeSanctions(const char* dbName, const char* userLogin, const int newPerm
         fileIndex += len_line_beg;
         free(line);
     } while ((ret = fDynamicReadline(&line, f)) != END_OF_FILE);
+    free(line); //здесь изменение
     fclose(f);
     return NOT_CONSIST;
 }
@@ -191,7 +192,11 @@ int loginDB(const char* dbName, const char* userLogin, const char* userPassword,
             fclose(out);
             return retF;
         }
-
+        else if(retF == END_OF_FILE){
+            fclose(out);
+            free(str);
+            return NOT_CONSIST;
+        }
         char** strings;
         int ret = stringToWords(str, &strings, &stringsAmount);
         if(ret != SUCCESS){
@@ -296,6 +301,11 @@ int findInDb(const char* dbName, const char* userLogin){
         if(retF != SUCCESS && retF != END_OF_FILE){
             fclose(out);
             return retF;
+        }
+        else if(retF == END_OF_FILE){
+            fclose(out);
+            free(str);
+            return NOT_CONSIST;
         }
 
         char** strings;

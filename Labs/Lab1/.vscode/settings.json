@@ -1,11 +1,4 @@
 {
-  "makefile.launchConfigurations": [
-    {
-      "cwd": "/home/gaalex/Programs/SysProg/SysProg/Labs/Lab1/Task1/output",
-      "binaryPath": "/home/gaalex/Programs/SysProg/SysProg/Labs/Lab1/Task1/output/main",
-      "binaryArgs": []
-    }
-  ],
   "C_Cpp_Runner.cCompilerPath": "gcc",
   "C_Cpp_Runner.cppCompilerPath": "g++",
   "C_Cpp_Runner.debuggerPath": "gdb",

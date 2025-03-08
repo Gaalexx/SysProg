@@ -100,6 +100,9 @@ void errorHandler(int ret){
     case WRONG_LEN:
         printf("The password mustn't be longer than 6 symbols!\n");
         break;
+    case NOT_CONSIST:
+        printf("There is no such login!\n");
+        break;
     default:
         break;
     }

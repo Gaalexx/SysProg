@@ -53,6 +53,11 @@ int main(int argc, char const *argv[])
             }
             free(strings);
             free(buffer);
+
+            if(user.login != NULL){
+                free(user.login);
+            }
+
             return 0;
         }
         
@@ -66,5 +71,6 @@ int main(int argc, char const *argv[])
         free(buffer);
     }
     
+
     return 0;
 }
