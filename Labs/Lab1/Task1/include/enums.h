@@ -24,7 +24,8 @@ enum retType{
     MUST_BE_INT,
     NU_IS_FORBIDDEN,
     NO_ATTEMPTS,
-    WRONG_LEN
+    WRONG_LEN,
+    DENIED
 };
 
 enum userState{

@@ -103,6 +103,9 @@ void errorHandler(int ret){
     case NOT_CONSIST:
         printf("There is no such login!\n");
         break;
+    case DENIED:
+        printf("Action denied!\n");
+        break;
     default:
         break;
     }

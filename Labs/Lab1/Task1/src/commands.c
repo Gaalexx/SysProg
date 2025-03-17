@@ -179,7 +179,23 @@ int sanctions(int argumentNumber, char** strings, struct User* user){
         }
     }
     
-    int ret = changeSanctions("db.txt", strings[1], atoi(strings[2]));
+    char* confirmation;
+    printf("Input 12345 to confirm sanctions... ");
+    int ret = dynamicReadline(&confirmation);
+
+    if(ret != SUCCESS){
+        return ret;
+    }
+
+    if(strlen(confirmation) != 5 || strcmp(confirmation, "12345")){
+        return DENIED;
+    }
+    
+    free(confirmation);
+
+    ret = changeSanctions("db.txt", strings[1], atoi(strings[2]));
+
+    
 
     return ret;
 }
