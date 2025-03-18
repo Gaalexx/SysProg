@@ -100,7 +100,7 @@ int daysRemainsForEnd(int year, int month, int day) {
 
 
 long long int daysDelta(struct Date curDate, struct Date otherDate){
-    int delta = 0;
+    long long int delta = 0;
     int cmp;
     if((cmp = dateCmp(curDate, otherDate)) == 0){
         return 0;
@@ -109,9 +109,9 @@ long long int daysDelta(struct Date curDate, struct Date otherDate){
         dateSwap(&curDate, &otherDate);
     }
 
-    delta += (curDate.year != otherDate.year) ? (daysRemainsForEnd(otherDate.year, otherDate.month, otherDate.day) + ((isLeapYear(curDate.year)) ? 366 : 365)) - 
-    daysRemainsForEnd(curDate.year, curDate.month, curDate.day) : (daysRemainsForEnd(otherDate.year, otherDate.month, otherDate.day) - 
-    ((isLeapYear(curDate.year)) ? 366 : 365)) - daysRemainsForEnd(curDate.year, curDate.month, curDate.day);
+    delta += ((curDate.year != otherDate.year) ? (daysRemainsForEnd(otherDate.year, otherDate.month, otherDate.day) + ((isLeapYear(curDate.year)) ? 366 : 365)) - 
+    daysRemainsForEnd(curDate.year, curDate.month, curDate.day) : (daysRemainsForEnd(otherDate.year, otherDate.month, otherDate.day) /* + 
+    ((isLeapYear(curDate.year)) ? 366 : 365) */ - daysRemainsForEnd(curDate.year, curDate.month, curDate.day)));
     
     for (int i = otherDate.year + 1; i < curDate.year; i++)
     {

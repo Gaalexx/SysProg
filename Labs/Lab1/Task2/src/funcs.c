@@ -3,6 +3,7 @@
 #include <math.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <dirent.h>
 #include <unistd.h>
 #include <ctype.h>
 #include <string.h>
@@ -13,11 +14,10 @@
 
 int searchInFile(char* fileNAme, char* strToFind, FILE* output){
     FILE* dtr = fopen(fileNAme, "r");
-    if(!dtr || !strToFind || !output){ //поправить мб
+    if(!dtr || !strToFind || !output){
         return NULL_ERROR;
     }
     int len = strlen(strToFind);
-    //fprintf(output, "File %s:\n", fileNAme);
     char ch = ' ';
     int flag_eq = 0;
     int enter_cnt = 1, num_of_sym = 1, iteration = 0, found_strs = 0;
@@ -39,7 +39,6 @@ int searchInFile(char* fileNAme, char* strToFind, FILE* output){
             while (ch != EOF || strToFind[i] != ch || strToFind[i] != '\0' || i != len)
             {
                 ch = fgetc(dtr);
-                //char str_i = strToFind[i];
                 if(strToFind[i] != ch  && !(strToFind[i] == '\n' && ch == '\r')){ 
                     fseek(dtr, iteration, SEEK_SET);
                     flag_eq = 0;
@@ -51,9 +50,7 @@ int searchInFile(char* fileNAme, char* strToFind, FILE* output){
                 }
             }
             if(flag_eq){
-                //fprintf(output, "\tString: %d\tNumber: %d\n", enter_cnt, num_of_sym - 1);
                 found_strs++;
-                //num_of_sym++;
                 fseek(dtr, iteration, SEEK_SET);
                 flag_eq = 0;
             }
@@ -74,17 +71,42 @@ int searchInFile(char* fileNAme, char* strToFind, FILE* output){
 
 int find(int argc, char* argv[], char* strToFind){
     FILE* sout = stdout;
+
     for (size_t i = 1; i < (size_t)argc - 2; i++)
     {
-        pid_t p = fork();
 
-        if(p < 0){
-            return FORK_ERROR;
+        FILE* f = fopen(argv[i], "r");
+        if(!f){
+            continue;
         }
-        else if(p == 0){
-            searchInFile(argv[i], strToFind, sout);
-            exit(0);
-        }
+
+        char* buf;
+        int ret;
+        
+
+        do
+        {
+            ret = fDynamicReadline(&buf, f);
+            if(ret != SUCCESS && ret != END_OF_FILE){
+                fclose(f);
+                return ret;
+            }
+
+            pid_t p = fork();
+
+            if(p < 0){
+                return FORK_ERROR;
+            }
+            else if(p == 0){
+                searchInFile(buf, strToFind, sout);
+                exit(0);
+            }
+         
+            free(buf);
+            
+        } while (ret != END_OF_FILE);
+
+        fclose(f);
     }
     return SUCCESS;
 }
@@ -224,7 +246,7 @@ int mask(FILE* f, const char* mask, int* answer){
     return SUCCESS;
 }
 
-int xorN(FILE* f, int N, unsigned long long int* xorRes){ //!!!!!!!протестировать!!!!!!!!
+int xorN(FILE* f, int N, unsigned long long int* xorRes){ 
     if(!f){
         return FILE_ERROR;
     }

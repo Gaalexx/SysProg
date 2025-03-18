@@ -118,24 +118,29 @@ int howmuch(int argumentNumber, char** strings, struct User* user){
     struct Date d1, d2;
     
     d1.year = 1900 + timeInfoNow->tm_year;
-    d1.month = timeInfoNow->tm_mon;
-    d1.day = timeInfoNow->tm_mday;
+    d1.month = timeInfoNow->tm_mon + 1;
+    d1.day = timeInfoNow->tm_mday + 1;
 
     d2.year = year;
     d2.month = month;
     d2.day = day;
 
-
+    if(d2.year < 1970){
+        printf("There might be errors if you have input a year that is less than 1970\n");
+    }
     switch (strings[2][1])
     {
+    case 'd':
+        printf("Delta in days: %lld\n", (daysDelta(d1, d2) == 0) ? daysDelta(d1, d2) - 1 : daysDelta(d1, d2));
+        break;
     case 's':
-        printf("Delta in seconds: %lld\n", daysDelta(d1, d2) * 24 * 60 * 60);
+        printf("Delta in seconds: %lld\n", (daysDelta(d1, d2) == 0) ? daysDelta(d1, d2) - 1 : daysDelta(d1, d2) * 24 * 60 * 60);
         break;
     case 'm':
-        printf("Delta in minutes: %lld\n", daysDelta(d1, d2) * 24 * 60);
+        printf("Delta in minutes: %lld\n", (daysDelta(d1, d2) == 0) ? daysDelta(d1, d2) - 1 : daysDelta(d1, d2) * 24 * 60);
         break;
     case 'h':
-        printf("Delta in hours: %lld\n", daysDelta(d1, d2) * 24);
+        printf("Delta in hours: %lld\n", (daysDelta(d1, d2) == 0) ? daysDelta(d1, d2) - 1 : daysDelta(d1, d2) * 24);
         break;
     case 'y':
         printf("Delta in years: %d\n", yearsDelta(d1, d2));

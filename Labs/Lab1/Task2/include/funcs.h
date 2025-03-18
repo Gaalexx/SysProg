@@ -1,6 +1,6 @@
 #ifndef FUNCS_H
 #define FUNCS_H
-
+#include <stdio.h>
 
 int searchInFile(char* fileNAme, char* strToFind, FILE* output);
 int find(int argc, char* argv[], char* strToFind);
