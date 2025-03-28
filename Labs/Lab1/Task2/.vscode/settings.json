@@ -120,6 +120,24 @@
         "find",
         "17"
       ]
+    },
+    {
+      "cwd": "/home/gaalex/Programs/SysProg/SysProg/Labs/Lab1/Task2",
+      "binaryPath": "/home/gaalex/Programs/SysProg/SysProg/Labs/Lab1/Task2/output/main",
+      "binaryArgs": [
+        "aaoo.txt",
+        "mask",
+        "10"
+      ]
+    },
+    {
+      "cwd": "/home/gaalex/Programs/SysProg/SysProg/Labs/Lab1/Task2",
+      "binaryPath": "/home/gaalex/Programs/SysProg/SysProg/Labs/Lab1/Task2/output/main",
+      "binaryArgs": [
+        "aaoo.txt",
+        "mask",
+        "11"
+      ]
     }
   ]
 }

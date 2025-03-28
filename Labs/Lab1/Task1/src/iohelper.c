@@ -56,7 +56,6 @@ int dynamicReadline(char** strr){
                 free((*strr));
                 return MEMORY_ERROR;
             }
-            //free((*strr));
             (*strr) = buf;
         }
         (*strr)[len++] = letter;

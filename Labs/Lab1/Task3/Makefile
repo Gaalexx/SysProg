@@ -7,12 +7,12 @@
 CC = gcc
 
 # define any compile-time flags
-CFLAGS	:= -Wall -Werror -Wextra -g -pedantic -fsanitize=address -fsanitize=leak
+CFLAGS	:= -Werror -Wall -Wextra -g -pedantic -fsanitize=address -fsanitize=leak 
 
 # define library paths in addition to /usr/lib
 #   if I wanted to include libraries not in /usr/lib I'd specify
 #   their path using -Lpath, something like:
-LFLAGS = -lm
+LFLAGS =
 
 # define output directory
 OUTPUT	:= output
@@ -95,5 +95,5 @@ clean:
 	@echo Cleanup complete!
 
 run: all
-	./$(OUTPUTMAIN) aaoo.txt mask 10
+	./$(OUTPUTMAIN)
 	@echo Executing 'run: all' complete!

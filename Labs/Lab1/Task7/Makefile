@@ -7,7 +7,7 @@
 CC = gcc
 
 # define any compile-time flags
-CFLAGS	:= -Wall -Wextra -g
+CFLAGS	:= -g -Wall -Werror -Wextra #-pedantic -fsanitize=address -fsanitize=leak
 
 # define library paths in addition to /usr/lib
 #   if I wanted to include libraries not in /usr/lib I'd specify
@@ -82,9 +82,10 @@ $(MAIN): $(OBJECTS)
 # this is a suffix replacement rule for building .o's and .d's from .c's
 # it uses automatic variables $<: the name of the prerequisite of
 # the rule(a .c file) and $@: the name of the target of the rule (a .o file) 
-# -MMD generates dependency output files same name as the .o file
-# (see the gnu make manual section about automatic variables)
-.c.o:
+# -MMD generates dependency output files same name as the .o file ~/Programs/SysProg/SysProg/Labs/Lab1/ -a
+# (see the gnu make manual section about automatic variables) 
+#/home/gaalex/Programs/SysProg/SysProg/Labs/ /home/gaalex/Programs/ -l /home/gaalex/Programs/SysProg/SysProg/Labs/Lab1/ -a
+.c.o: 
 	$(CC) $(CFLAGS) $(INCLUDES) -c -MMD $<  -o $@
 
 .PHONY: clean
@@ -95,5 +96,5 @@ clean:
 	@echo Cleanup complete!
 
 run: all
-	./$(OUTPUTMAIN)
+	./$(OUTPUTMAIN) ../../.
 	@echo Executing 'run: all' complete!

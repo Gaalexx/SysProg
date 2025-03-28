@@ -155,13 +155,14 @@ int changeSanctions(const char* dbName, const char* userLogin, const int newPerm
             return SUCCESS;
         }
 
+        fileIndex += len_line_beg;
+
 
         for (size_t i = 0; i < (size_t)numberOfWords; i++)
         {
             free(words[i]);
         }
         free(words);
-        fileIndex += len_line_beg;
         free(line);
     } while ((ret = fDynamicReadline(&line, f)) != END_OF_FILE);
     free(line); //здесь изменение

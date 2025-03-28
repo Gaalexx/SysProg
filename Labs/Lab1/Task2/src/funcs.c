@@ -112,14 +112,47 @@ int find(int argc, char* argv[], char* strToFind){
 }
 
 int isInt(const char* str){
-    for (size_t i = 0; i < strlen(str); i++)
-    {
+    int i = 0;
+    while(str[i] != '\0'){
         if(!isdigit(str[i]) && (i != 0 && str[i] != '-')){
             return 0;
         }
+        i++;
     }
     return 1;
 }
+
+int hexCharToInt(char c) {
+    if (c >= '0' && c <= '9') {
+        return c - '0';
+    } else if (c >= 'A' && c <= 'F') {
+        return 10 + (c - 'A');
+    } else if (c >= 'a' && c <= 'f') {
+        return 10 + (c - 'a'); 
+    }
+    return -1; 
+}
+
+
+int hexToDec(const char* hex) {
+    if (!hex) {
+        return -1;
+    }
+
+    int result = 0;
+    int len = strlen(hex);
+
+    for (int i = 0; i < len; i++) {
+        int value = hexCharToInt(hex[i]);
+        if (value == -1) {
+            return -1;
+        }
+        result = result * 16 + value; 
+    }
+
+    return result;
+}
+
 
 int newFileName(char* sourceFileName, char** destFileName, int iteration){
     if(!sourceFileName){
@@ -179,8 +212,14 @@ int copyFile(char* fileName, int iteration){
         if(charsRead > 0){
             fwrite((void*)buffer, sizeof(char), charsRead, fo);
         }
-    } while (charsRead == BUFSIZ);
+    } while (charsRead == BUFSIZ && !ferror(fi));
     
+    if (ferror(fi)) {
+        free(buffer);
+        free(nFileName);
+        return FILE_ERROR;
+    }
+
     free(buffer);
     free(nFileName);
 
@@ -218,31 +257,35 @@ int copyN(int argc, char* argv[]){
 
 int mask(FILE* f, const char* mask, int* answer){
     char* str;
-    int ret = fDynamicReadline(&str, f);
-    if(ret != SUCCESS){
-        return ret;
-    }
-    int intMask = atoi(mask);
+    int ret;
+    int intMask = hexToDec(mask);
+    char* savePTR;
     (*answer) = 0;
     do
     {
-        char* word = strtok(str, " \t\n");
-        do
-        {
-            if(ret != SUCCESS){
-                free(str);
-                return ret;
-            }
-            if(isInt(word)){
-                if((atoi(word) & intMask) == intMask){
-                    ++(*answer);
-                }
-            }
-        } while ((word = strtok(NULL, " \n\t")) != NULL);
-        free(str);
         ret = fDynamicReadline(&str, f);
+        if(ret != SUCCESS && ret != END_OF_FILE){
+            return ret;
+        }
+        char* word = strtok_r(str, " \t\n", &savePTR);
+        if(word == NULL){
+            continue;
+        }
+        else{
+            do
+            {
+                if(ret != SUCCESS && ret != END_OF_FILE){
+                    return ret;
+                }
+                if(isInt(word)){
+                    if((atoi(word) & intMask) == intMask){
+                        ++(*answer);
+                    }
+                }
+            } while ((word = strtok_r(NULL, " \n\t", &savePTR)) != NULL);
+        }
+        free(str);
     } while (ret != END_OF_FILE);
-    free(str);
     return SUCCESS;
 }
 
@@ -293,8 +336,14 @@ int xorN(FILE* f, int N, unsigned long long int* xorRes){
             }
             
         }
-    } while (!feof(f));
-    
+    } while (!feof(f) && !ferror(f));
+
+    if (ferror(f)) {
+        free(buffer);
+        free(bufXor);
+        return FILE_ERROR;
+    }
+
     if(N < 3){
         *xorRes = (unsigned long long int)(((0xF0 & bufXor[0]) >> 4) ^ (0xF & bufXor[0]));
     }

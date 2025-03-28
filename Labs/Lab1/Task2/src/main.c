@@ -83,9 +83,11 @@ int main(int argc, char *argv[])
                         int res = 0;
                         FILE* f = fopen(argv[j], "r");
                         if(!f){
+                            printf("%s wasn't opened!\n", argv[j]);
                             continue;
                         }
                         ret = mask(f, argv[argc - 1], &res);
+                        fclose(f);
                         if(ret == SUCCESS){
                             printf("In %s file there are %d integers with mask %s.\n", argv[j], res, argv[argc - 1]);
                         }
@@ -116,6 +118,7 @@ int main(int argc, char *argv[])
                     break;
             
             default:
+                    printf("No such command!\n");
                 break;
             }
         }

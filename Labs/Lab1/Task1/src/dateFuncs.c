@@ -109,9 +109,24 @@ long long int daysDelta(struct Date curDate, struct Date otherDate){
         dateSwap(&curDate, &otherDate);
     }
 
-    delta += ((curDate.year != otherDate.year) ? (daysRemainsForEnd(otherDate.year, otherDate.month, otherDate.day) + ((isLeapYear(curDate.year)) ? 366 : 365)) - 
-    daysRemainsForEnd(curDate.year, curDate.month, curDate.day) : (daysRemainsForEnd(otherDate.year, otherDate.month, otherDate.day) /* + 
-    ((isLeapYear(curDate.year)) ? 366 : 365) */ - daysRemainsForEnd(curDate.year, curDate.month, curDate.day)));
+    /* delta += ((curDate.year != otherDate.year) ? (daysRemainsForEnd(otherDate.year, otherDate.month, otherDate.day)
+     + ((isLeapYear(curDate.year)) ? 366 : 365)) - 
+    daysRemainsForEnd(curDate.year, curDate.month, curDate.day) : 
+    (daysRemainsForEnd(otherDate.year, otherDate.month, otherDate.day) - 
+    daysRemainsForEnd(curDate.year, curDate.month, curDate.day))); */
+
+
+    if (curDate.year != otherDate.year) {
+        int leapDays = isLeapYear(curDate.year) ? 366 : 365;
+        delta += 
+        (daysRemainsForEnd(otherDate.year, otherDate.month, otherDate.day) 
+        + 
+        leapDays 
+        - 
+        daysRemainsForEnd(curDate.year, curDate.month, curDate.day));
+    } else {
+        delta += (daysRemainsForEnd(otherDate.year, otherDate.month, otherDate.day) - daysRemainsForEnd(curDate.year, curDate.month, curDate.day));
+    }
     
     for (int i = otherDate.year + 1; i < curDate.year; i++)
     {

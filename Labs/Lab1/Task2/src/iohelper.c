@@ -2,6 +2,40 @@
 #include "enums.h"
 #include "iohelper.h"
 
+/* int fDynamicReadline(char** strr, FILE* file){
+    if(!strr){
+        return NULL_ERROR;
+    }
+    else if(!file){
+        return FILE_ERROR;
+    }
+
+
+    size_t size = 32, len = 0;
+    (*strr) = (char*)malloc(size * sizeof(char));
+    if(!(*strr)){
+        return MEMORY_ERROR;
+    }
+    char letter;
+    while((letter = fgetc(file)) != '\n' && letter != EOF){
+        if(len + 1 == size){
+            size *= 2;
+            char* buf = (char*)realloc((*strr), sizeof(char) * size);
+            if(!buf){
+                free((*strr));
+                return MEMORY_ERROR;
+            }
+            (*strr) = buf;
+        }
+        (*strr)[len++] = letter;
+        (*strr)[len] = '\0';
+    }
+    if(letter == EOF){
+        return END_OF_FILE;
+    }
+    return SUCCESS;
+} */
+
 int fDynamicReadline(char** strr, FILE* file){
     if(!strr){
         return NULL_ERROR;
@@ -56,7 +90,6 @@ int dynamicReadline(char** strr){
                 free((*strr));
                 return MEMORY_ERROR;
             }
-            free((*strr));
             (*strr) = buf;
         }
         (*strr)[len++] = letter;
