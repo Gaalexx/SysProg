@@ -6,11 +6,12 @@
 #include <sys/msg.h>
 #include <sys/ipc.h>
 #include <pthread.h>
+#include <ctype.h>
 
 #define MESSAGE_SIZE 1024
 #define STRINGIZE(x) #x
 #define MS_STR(x) STRINGIZE(x)
-#define structSiz(strct) (sizeof(strct.messageText) + sizeof(strct.from) + sizeof(strct.userName)) 
+#define structSiz(strct) (sizeof(strct.messageText) + sizeof(strct.from)) 
 
 
 struct message
@@ -18,7 +19,6 @@ struct message
     long mtype;
     char messageText[MESSAGE_SIZE];
     int from;
-    char userName[128];
 };
 
 enum messageTypes{
@@ -68,22 +68,53 @@ int main(int argc, char const *argv[])
         return -1;
     }
 
-
-    char username[128];
-    printf("Input your name: ");
-    scanf("%128s", username);
-    {
-        struct message reg;
-        reg.mtype = TO_SERVER;
-        reg.from = (int)pid;
-        strcpy(reg.messageText,"registration");
-        strcpy(reg.userName, username);
-        if (msgsnd(msgId, &reg, structSiz(reg), 0) == -1) {
-            perror("msgsnd");
+    if(argc > 1){
+        FILE* f = fopen(argv[1], "r");
+        if(!f){
+            printf("File error!\n");
+            //goto nofile;
             return -1;
+        }
+        char c = fgetc(f);
+        size_t len = 0;
+        char buf[MESSAGE_SIZE];
+        do
+        {
+            if(iscntrl(c)){
+                buf[len] = '\0';
+                len = 0;
+                struct message msg;
+                msg.from = (int)pid;
+                msg.mtype = TO_SERVER;
+                printf("%s\n", msg.messageText);
+                sleep(1);
+                strcpy(msg.messageText, buf);
+                if (msgsnd(msgId, &msg, structSiz(msg), 0) == -1) {
+                    perror("msgsnd");
+                    pthread_cancel(rcvThread);
+                    return -1;
+                }
+            }
+            else{
+                buf[len++] = c;   
+            }
+        } while ((c = fgetc(f)) != EOF);
+        if(iscntrl(c)){
+            buf[len] = '\0';
+            len = 0;
+            struct message msg;
+            msg.from = (int)pid;
+            msg.mtype = TO_SERVER;
+            strcpy(msg.messageText, buf);
+            if (msgsnd(msgId, &msg, structSiz(msg), 0) == -1) {
+                perror("msgsnd");
+                pthread_cancel(rcvThread);
+                return -1;
+            }
         }
     }
 
+//nofile:
     while(1){
         char buf[MESSAGE_SIZE];
         struct message msg;
@@ -91,6 +122,7 @@ int main(int argc, char const *argv[])
         msg.from = (int)pid;
         char c;
         int ii = 0;
+
         fflush(NULL);
         while((c = getchar()) != '\n'){
             buf[ii++] = c;
@@ -103,7 +135,6 @@ int main(int argc, char const *argv[])
             return 0;
         }
         strcpy(msg.messageText, buf);
-        strcpy(msg.userName, username);
 
         if (msgsnd(msgId, &msg, structSiz(msg), 0) == -1) {
             perror("msgsnd");

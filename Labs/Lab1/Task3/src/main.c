@@ -8,6 +8,7 @@
 #include <time.h>
 
 
+
 #define EATING_TIME 2
 #define THINKING_TIME 2
 #define SIMULATION_DURATION 30
@@ -56,40 +57,39 @@ void* problem(void* arg){
     int leftFork = id;
     int rightFork = (id + 1) % pdata.phAmount;
     int semId = pdata.semId;
-    
+    /* 
     int firstFork = leftFork < rightFork ? leftFork : rightFork;
-    int secondFork = leftFork < rightFork ? rightFork : leftFork;
+    int secondFork = leftFork < rightFork ? rightFork : leftFork; */
 
-    /* int firstFork = leftFork;
-    int secondFork = rightFork; */
+    int firstFork = leftFork;
+    int secondFork = rightFork;
     
     time_t start_time = time(NULL);
     
     while (time(NULL) - start_time < SIMULATION_DURATION) {
-        printf("Философ %d размышляет...\n", id);
-        sleep(THINKING_TIME);
-        
-        printf("Философ %d хочет есть...\n", id);
+        printf("Philosopher %d is thinking...\n", id);
+        //sleep(rand() % 5);
+        printf("Philosopher %d is hungry...\n", id);
         
         waitSemaphore(semId, firstFork);
-        printf("Философ %d взял первую вилку %d\n", id, firstFork);
+        printf("Philosopher %d picked up first fork %d\n", id, firstFork);
 
-        //usleep(10000);
+        usleep(10000);
         
         waitSemaphore(semId, secondFork);
-        printf("Философ %d взял вторую вилку %d\n", id, secondFork);
+        printf("Philosopher %d picked up second fork %d\n", id, secondFork);
         
-        printf("Философ %d ест...\n", id);
+        printf("Philosopher %d is eating...\n", id);
         sleep(EATING_TIME);
         
         signalSemaphore(semId, secondFork);
-        printf("Философ %d положил вторую вилку %d\n", id, secondFork);
+        printf("Philosopher %d put down second fork %d\n", id, secondFork);
         
         signalSemaphore(semId, firstFork);
-        printf("Философ %d положил первую вилку %d\n", id, firstFork);
+        printf("Philosopher %d put down first fork %d\n", id, firstFork);
     }
     
-    printf("Философ %d закончил трапезу.\n", id);
+    printf("Philosopher %d has finished dining.\n", id);
     return NULL;
 
 }
@@ -121,7 +121,7 @@ int main(int argc, char const *argv[])
     }
 
 
-    int semFd = semget(0, phAmount, IPC_CREAT | /* IPC_EXCL */0666);
+    int semFd = semget(0, phAmount, IPC_CREAT | 0666);
     if(semFd == -1){
         printf("Sem error!\n");
         free(threads);

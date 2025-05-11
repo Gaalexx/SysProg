@@ -95,5 +95,5 @@ clean:
 	@echo Cleanup complete!
 
 run: all
-	./$(OUTPUTMAIN)
+	./$(OUTPUTMAIN) 4 7
 	@echo Executing 'run: all' complete!

@@ -15,7 +15,7 @@
 #define LEFT 0
 #define RIGHT 1
 
-#define structSiz(strct) (sizeof(strct.messageText) + sizeof(strct.from) + sizeof(strct.userName)) 
+#define structSiz(strct) (sizeof(strct.messageText) + sizeof(strct.from)) 
 
 static int msgId;
 
@@ -24,17 +24,10 @@ struct message
     long mtype;
     char messageText[MESSAGE_SIZE];
     int from;
-    char userName[128];
 };
 
 
 
-struct GameDB
-{
-    char** names;
-    size_t capacity;
-    size_t lenght;
-};
 
 typedef enum {
     WOLF = 1,
@@ -66,53 +59,12 @@ typedef struct{
     Items buffer;
 }Game;
 
-typedef int (*callback)(struct GameDB*, Game*, struct message*, unsigned char);
-
-int registration(struct GameDB* gdb, Game* game, struct message* msg, unsigned char arg){
-    (void)game;(void)arg;
-    for (size_t i = 0; i < gdb->lenght; i++)
-    {
-        if(!strcmp(gdb->names[i], msg->userName)){
-            return ALREADY_EXISTS;
-        }
-    }
-    if(gdb->lenght == gdb->capacity){
-        gdb->capacity *= 2;
-        char** buf = (char**)realloc(gdb->names, gdb->capacity * sizeof(char*));
-        if(!buf){
-            return MEMORY_ERROR;
-        }
-        gdb->names = buf;
-    }
-    size_t len = strlen(msg->userName);
-    char* name = (char*)malloc(sizeof(char) * (len + 1));
-    if(!name){
-        for (size_t i = 0; i < gdb->lenght; i++)
-        {
-            free(gdb->names[i]);
-        }
-        free(gdb->names);
-        return MEMORY_ERROR;
-    }
-    strcpy(name, msg->userName);
-    name[len] = '\0';
-    gdb->names[gdb->lenght++] = name;
+typedef int (*callback)(Game*, struct message*, unsigned char);
 
 
 
-    strcpy(msg->messageText, "Good name!\n");
-    msg->mtype = msg->from;
-    msg->from = TO_SERVER;
-    if(msgsnd(msgId, msg, structSiz((*msg)), 0) == -1){
-        perror("msgsnd");
-        return MESSAGE_ERROR;
-    }
-
-    return SUCCESS;
-}
-
-int take(struct GameDB* gdb, Game* game, struct message* msg, unsigned char arg){
-    (void)gdb;(void)msg;
+int take(Game* game, struct message* msg, unsigned char arg){
+    (void)msg;
     if(game->buffer != 0){
         return THE_BUFFER_IS_FULL;
     }
@@ -134,8 +86,8 @@ int take(struct GameDB* gdb, Game* game, struct message* msg, unsigned char arg)
     return SUCCESS;
 }
 
-int put(struct GameDB* gdb, Game* game, struct message* msg, unsigned char arg){
-    (void)msg;(void)arg;(void)gdb;
+int put(Game* game, struct message* msg, unsigned char arg){
+    (void)msg;(void)arg;
     if(!(game->buffer | 0)){
         return THE_BUFFER_IS_EMPTY;
     }
@@ -156,8 +108,8 @@ int put(struct GameDB* gdb, Game* game, struct message* msg, unsigned char arg){
     return SUCCESS;
 }
 
-int move(struct GameDB* gdb, Game* game, struct message* msg, unsigned char arg){
-    (void)arg;(void)msg;(void)gdb;
+int move(Game* game, struct message* msg, unsigned char arg){ 
+    (void)arg;(void)msg;
     if(game->curPosition == LEFT){
         switch (game->l)
         {
@@ -204,11 +156,50 @@ int move(struct GameDB* gdb, Game* game, struct message* msg, unsigned char arg)
     return SUCCESS;
 }
 
-int help(struct GameDB* gdb, Game* game, struct message* msg, unsigned char arg){
-    (void)arg;(void)game;(void)gdb;
+
+int move_new(Game* game, struct message* msg, unsigned char arg){ //TODO: переписать логику под предотвращение неправильного хода
+    (void)arg;(void)msg;
+    if(game->curPosition == LEFT){
+        switch (game->l)
+        {
+            case CABBAGE | GOAT:
+                return GOAT_ATE_CABBAGE;
+                break;
+            case WOLF | GOAT:
+                
+                return WOLF_ATE_GOAT;
+                break;
+            case WOLF | GOAT | CABBAGE:    
+                return WOLF_ATE_GOAT;
+                break;
+            default:
+                break;
+        }
+        game->curPosition = RIGHT;
+    }else{
+        switch (game->r)
+        {
+            case CABBAGE | GOAT:
+                return GOAT_ATE_CABBAGE;
+                break;
+            case WOLF | GOAT:
+                return WOLF_ATE_GOAT;
+                break;
+            case WOLF | GOAT | CABBAGE:    
+                return WOLF_ATE_GOAT;
+                break;
+            default:
+                break;
+        }
+        game->curPosition = LEFT;
+    }
+    return SUCCESS;
+}
+
+int help(Game* game, struct message* msg, unsigned char arg){
+    (void)arg;(void)game;(void)msg;
     struct message hlp;
-    hlp.mtype = TO_CLIENT;
-    strcpy(hlp.userName, msg->userName);
+    hlp.mtype = msg->from;
     strcpy(hlp.messageText, "take <item> - to take one of items (cabbage, wolf or goat)\nput; - to put an item to the nearest coast\n"
     "move; - to move to another coast\nhelp; - to see all commands\n"); 
     if(msgsnd(msgId, &hlp, structSiz(hlp), 0) == -1){
@@ -218,8 +209,8 @@ int help(struct GameDB* gdb, Game* game, struct message* msg, unsigned char arg)
     return SUCCESS;
 }
 
-int curpos(struct GameDB* gdb, Game* game, struct message* msg, unsigned char arg){
-    (void)gdb;(void)game;(void)msg;(void)arg;
+int curpos(Game* game, struct message* msg, unsigned char arg){
+    (void)game;(void)msg;(void)arg;
     struct message hlp;
     hlp.mtype = msg->from;
     hlp.from = TO_SERVER;
@@ -268,9 +259,9 @@ int curpos(struct GameDB* gdb, Game* game, struct message* msg, unsigned char ar
     return SUCCESS;
 }
 
-const char *commands[] = {"registration", "take", "put;", "move;", "help;", "curpos;"};
+const char *commands[] = {"take", "put;", "move;", "help;", "curpos;"};
 const char *takeArgs[] = {"wolf;", "goat;", "cabbage;"};
-const callback cbs[] = {registration, take, put, move, help, curpos};
+const callback cbs[] = {take, put, move_new, help, curpos};
 
 int answerHandler(int answer, struct message* msg){
     (void)answer;(void)msg;
@@ -326,7 +317,7 @@ int answerHandler(int answer, struct message* msg){
         }
     case GOAT_ATE_CABBAGE:
         {
-            strcpy(ans.messageText, "Goat ate cabbage! You've lost. The game will be restarted.\n");
+            strcpy(ans.messageText, "You should not do it, because if you do it the goat will eat the cabbage! Think a bit more and try again...\n");
             if(msgsnd(msgId, &ans, structSiz(ans), 0) == -1){
                 perror("msgsnd");
                 return MESSAGE_ERROR;
@@ -335,7 +326,7 @@ int answerHandler(int answer, struct message* msg){
         }
     case WOLF_ATE_GOAT:
         {
-            strcpy(ans.messageText, "Wolf ate cabbage! You've lost. The game will be restarted.\n");
+            strcpy(ans.messageText, "You should not do it, because if you do it the wolf will eat the goat! Think a bit more and try again...\n");
             if(msgsnd(msgId, &ans, structSiz(ans), 0) == -1){
                 perror("msgsnd");
                 return MESSAGE_ERROR;
@@ -363,8 +354,8 @@ void* input(void* argg)
     Game game;
     game.l = (unsigned char)0;
     game.r = (unsigned char)WOLF | (unsigned char)GOAT | (unsigned char)CABBAGE;
-    
-    struct GameDB gdb = *((struct GameDB*)argg);
+    game.curPosition = RIGHT;
+    game.buffer = 0;
 
     key_t key = ftok("/home/gaalex/Programs/SysProg/SysProg/Labs/Lab1/Task4/Server/output/main", 65);
     if(key == -1){
@@ -372,6 +363,7 @@ void* input(void* argg)
         printf("Ftok error!\n");
         return NULL;
     }
+    
     msgId = msgget(key, IPC_CREAT | 0700);
     if(msgId == -1){
         perror("msgget");
@@ -390,9 +382,6 @@ void* input(void* argg)
             msgctl(msgId, IPC_RMID, NULL);
             return NULL;
         }
-        if(msg.messageText[0] == '\0'){
-            continue;
-        }
         printf("%s\n", msg.messageText);
 
         char* ptr = strtok(msg.messageText, " \n\t");
@@ -403,7 +392,7 @@ void* input(void* argg)
         {
             if(cnt == 0){
                 
-                for (size_t i = 0; i < 6; i++)
+                for (size_t i = 0; i < 5; i++)
                 {
                     if(!strcmp(ptr, commands[i])){
                         cb = cbs[i];
@@ -413,8 +402,7 @@ void* input(void* argg)
                 }
                 if(!cnt){
                     struct message ans;
-                    ans.mtype = TO_CLIENT;
-                    strcpy(ans.userName, msg.userName);
+                    ans.mtype = msg.from;
                     strcpy(ans.messageText, "No such command! Input 'help;' to find out all commands!\n");
                     if(msgsnd(msgId, &ans, structSiz(ans), 0) == -1){
                         perror("msgsnd");
@@ -432,7 +420,11 @@ void* input(void* argg)
             }
             
         } while ((ptr = strtok(NULL, " \n\t")) != NULL);
-        int ret = cb(&gdb, &game, &msg, arg);
+        int ret = SUCCESS;
+        if(cnt != 0){
+            ret = cb(&game, &msg, arg);
+        }
+        
         ret = answerHandler(ret, &msg);
        
         continue;
@@ -445,18 +437,9 @@ void* input(void* argg)
 int main(int argc, char* argv[]){
     (void)argc;(void)argv;
 
-    struct GameDB gdb;
-    gdb.capacity = 128;
-    gdb.lenght = 0;
-    gdb.names = (char**)malloc(gdb.capacity * sizeof(char*));
-    if(!gdb.names){
-        printf("Memory error!\n");
-        return -1;
-    }
-
     pthread_t mth;
 
-    if(pthread_create(&mth, NULL, input, (void*)(&gdb)) == -1){
+    if(pthread_create(&mth, NULL, input, NULL) == -1){
         printf("Thread error!\n");
         return -1;
     }
@@ -464,11 +447,6 @@ int main(int argc, char* argv[]){
     char buf[128];
     scanf("%s", buf);
     pthread_cancel(mth);
-    for (size_t i = 0; i < gdb.lenght; i++)
-    {
-        free(gdb.names[i]);
-    }
-    free(gdb.names);
     return 0;
 }
 

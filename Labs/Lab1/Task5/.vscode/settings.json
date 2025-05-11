@@ -56,21 +56,18 @@
   "C_Cpp_Runner.showCompilationTime": false,
   "C_Cpp_Runner.useLinkTimeOptimization": false,
   "C_Cpp_Runner.msvcSecureNoWarnings": false,
-  "files.associations": {
-    "sem.h": "c",
-    "unistd.h": "c"
-  },
   "makefile.launchConfigurations": [
     {
-      "cwd": "/home/gaalex/Programs/SysProg/SysProg/Labs/Lab1/Task3/output",
-      "binaryPath": "/home/gaalex/Programs/SysProg/SysProg/Labs/Lab1/Task3/output/main",
+      "cwd": "/home/gaalex/Programs/SysProg/SysProg/Labs/Lab1/Task5/output",
+      "binaryPath": "/home/gaalex/Programs/SysProg/SysProg/Labs/Lab1/Task5/output/main",
       "binaryArgs": []
     },
     {
-      "cwd": "/home/gaalex/Programs/SysProg/SysProg/Labs/Lab1/Task3",
-      "binaryPath": "/home/gaalex/Programs/SysProg/SysProg/Labs/Lab1/Task3/output/main",
+      "cwd": "/home/gaalex/Programs/SysProg/SysProg/Labs/Lab1/Task5",
+      "binaryPath": "/home/gaalex/Programs/SysProg/SysProg/Labs/Lab1/Task5/output/main",
       "binaryArgs": [
-        "10"
+        "4",
+        "7"
       ]
     }
   ]
