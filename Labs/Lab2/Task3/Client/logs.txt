@@ -1,0 +1,3 @@
+2025-05-16 20:34:08: INFO: Semaphore was opened successfuly.
+2025-05-16 20:34:08: INFO: Shared memory was opened.
+2025-05-16 20:34:08: INFO: Memory mapping done.

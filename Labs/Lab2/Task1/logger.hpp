@@ -9,29 +9,19 @@
 #include <memory>
 #include <string>
 
-
 class LoggerBuilder;
 
 class Logger
 {
 private:
     friend class LoggerBuilder;
+    friend class UniquePtrLoggerBuilder;
 
     std::vector<std::reference_wrapper<std::ostream>> handlers;
     std::vector<std::unique_ptr<std::ostream>> own_handlers;
     unsigned int log_level;
 
     Logger() {}
-
-public:
-    enum LogLevel
-    {
-        CRITICAL,
-        ERROR,
-        WARNING,
-        INFO,
-        DEBUG
-    };
 
     void PrintMessage(const std::string &str, unsigned int lvl = WARNING)
     {
@@ -68,6 +58,16 @@ public:
             }
         }
     }
+
+public:
+    enum LogLevel
+    {
+        CRITICAL,
+        ERROR,
+        WARNING,
+        INFO,
+        DEBUG
+    };
 
     void ChangeLogLevel(LogLevel lvl)
     {
@@ -124,11 +124,42 @@ public:
         return *this;
     }
 
-    LoggerBuilder& add_handler(std::unique_ptr<std::ostream> stream) {
-		this->logger->handlers.push_back(std::ref(*stream.get()));
-		this->logger->own_handlers.push_back(std::move(stream));
-		return *this;
-	}
+    LoggerBuilder &add_handler(std::unique_ptr<std::ostream> stream)
+    {
+        this->logger->handlers.push_back(std::ref(*stream.get()));
+        this->logger->own_handlers.push_back(std::move(stream));
+        return *this;
+    }
 
     Logger *make_object() { return this->logger; }
+};
+
+class UniquePtrLoggerBuilder
+{
+private:
+    std::unique_ptr<Logger> logger = nullptr;
+
+public:
+    UniquePtrLoggerBuilder() : logger(new Logger()) {}
+
+    UniquePtrLoggerBuilder &set_level(unsigned int logging_level)
+    {
+        logger->log_level = logging_level;
+        return *this;
+    }
+
+    UniquePtrLoggerBuilder &add_handler(std::ostream &stream)
+    {
+        this->logger->handlers.push_back(std::ref(stream));
+        return *this;
+    }
+
+    UniquePtrLoggerBuilder &add_handler(std::unique_ptr<std::ostream> stream)
+    {
+        this->logger->handlers.push_back(std::ref(*stream.get()));
+        this->logger->own_handlers.push_back(std::move(stream));
+        return *this;
+    }
+
+    std::unique_ptr<Logger> make_object() { return std::move(logger); }
 };
